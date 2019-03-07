@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: Run post comand
+      command: "cd /home/ubuntu; touch post-file-flag"

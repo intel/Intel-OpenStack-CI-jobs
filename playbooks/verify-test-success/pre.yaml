@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: Run pre command
+      command: "cd /home/ubuntu; touch pre-file-flag"
