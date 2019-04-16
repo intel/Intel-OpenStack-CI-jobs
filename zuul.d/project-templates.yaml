@@ -1,0 +1,47 @@
+- project-template:
+    name: openstack-taas-jobs
+    description: |
+      Runs Sriov job on tap-as-a-service project
+    check:
+      jobs:
+        - tap-as-a-service-dsvm-intel-sriov:
+            branches: master
+            irrelevant-files:
+              - ^(test-|)requirements.txt$
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^neutron/locale/.*$
+              - ^neutron/tests/unit/.*$
+              - ^releasenotes/.*$
+              - ^setup.cfg$
+              - ^tools/.*$
+              - ^tox.ini$
+
+
+- project-template:
+    name: openstack-lower-constraints-jobs
+    description: |
+      Runs openstack-tox-lower-constraints in the check pipeline.
+    check:
+      jobs:
+        - openstack-tox-lower-constraints:
+            branches: master
+
+- project-template:
+    name: tap-as-a-service-tempest-plugin-jobs
+    check:
+      jobs:
+        - tap-as-a-service-tempest-plugin:
+            branches: master
+
+- project-template:
+    name: system-required
+    description: |
+      Jobs that *every* project in OpenStack CI should have by default.
+
+      This is automatically added to all projects in OpenStack CI, no
+      repository should use this directly.
+    # Include a check queue so that initially every repo has a check queue
+    # and we can report invalid zuul.yaml files.
+    check:
+      jobs: []

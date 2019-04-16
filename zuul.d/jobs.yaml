@@ -1,5 +1,12 @@
 # Shared jobs that are generally applicable to everyone
 # Assumes a 'base' job defined elsewhere
+- project:
+    check:
+      jobs:
+        - verify-test-success
+        - goodbyejob
+        - tap-as-a-service-dsvm-intel-sriov
+
 - job:
     name: verify-test-success
     description: |
@@ -14,9 +21,41 @@
     name: goodbyejob
     run: playbooks/goodbyejob.yaml
 
-- project:
-    check:
-      jobs:
-        - verify-test-success
-        - goodbyejob
+- job:
+    name: tap-as-a-service-dsvm-intel-sriov
+    description: |
+      setup devstack and test port mirroring
+      on intel nic using tempest.
+    pre-run: playbooks/inteltaptest/pre.yaml
+    run: playbooks/inteltaptest/run.yaml
 
+- job:
+    name: run-test-command
+    description: |
+      Run simple command as test.
+
+      To use this, set the ``test_command`` variable.
+    run: playbooks/run-test-command/run.yaml
+    vars:
+      test_command: "touch sriov_file"
+
+- job:
+    name: openstack-tox-lower-constraints
+    parent: openstack-tox
+    branches: ^(?!driverfixes/).*$
+    timeout: 2400
+    description: |
+      Run unit tests using the lower constraints.
+
+      Uses tox with the ``lower-constraints`` environment,
+      which should be configured to use Python 3 by default
+      unless the project does not support Python 3.
+    vars:
+      tox_envlist: lower-constraints
+      bindep_profile: test py35 py36
+
+- job:
+    name: tap-as-a-service-tempest-plugin
+    parent: devstack-tempest
+    description: |
+      Perform setup common to all tap-as-a-service tempest tests

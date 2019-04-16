@@ -1,0 +1,6 @@
+- hosts: all
+  roles:
+    - role: set-zuul-log-path-fact
+  tasks:
+    - name: run job
+      command: "sh /opt/workingdir/taas-related/ci-bash/deploy.sh {{zuul_log_path}}"
