@@ -5,7 +5,6 @@
       jobs:
         - verify-test-success
         - goodbyejob
-        - tap-as-a-service-dsvm-intel-sriov
 
 - job:
     name: verify-test-success
