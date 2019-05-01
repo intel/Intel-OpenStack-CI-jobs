@@ -4,6 +4,7 @@
     check:
       jobs:
         - verify-test-success
+        - verify-dyn-test-success
         - goodbyejob
 
 - job:
@@ -13,6 +14,20 @@
 
       To use this, set the ``test_command`` variable.
     run: playbooks/verify-test-success/run.yaml
+    vars:
+      test_command: "touch sriov_file"
+
+- job:
+    name: verify-dyn-test-success
+    description: |
+      Run simple commands as test.
+
+      To use this, set the ``test_command`` variable.
+    run: playbooks/verify-test-success/run.yaml
+    nodeset:
+      nodes:
+        - name: vm-dyn-xenial
+          label: vm-dyn-xenial
     vars:
       test_command: "touch sriov_file"
 
