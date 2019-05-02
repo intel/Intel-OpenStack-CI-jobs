@@ -3,9 +3,7 @@
 - project:
     check:
       jobs:
-        - verify-test-success
         - verify-dyn-test-success
-        - goodbyejob
 
 - job:
     name: verify-test-success
@@ -14,6 +12,10 @@
 
       To use this, set the ``test_command`` variable.
     run: playbooks/verify-test-success/run.yaml
+    nodeset:
+      nodes:
+        - name: ubuntu-xenial-virt
+          label: ubuntu-xenial-virt
     vars:
       test_command: "touch sriov_file"
 
