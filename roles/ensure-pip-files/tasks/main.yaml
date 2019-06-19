@@ -1,0 +1,9 @@
+- name: "Ensure sys info dir"
+  file: 
+    path: "{{ sys_info_dir }}"
+    state: directory
+
+- name: "Ensure sys info dir pip log"
+  file: 
+    path: "{{ pip_info_log }}"
+    state: touch

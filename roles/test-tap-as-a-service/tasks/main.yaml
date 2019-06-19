@@ -1,0 +1,34 @@
+- name: Clean tempest repository (rm {{ tempest_testfile }})
+  file:
+    path: "{{ tempest_testfile }}"
+    state: absent
+  become: yes
+
+#- name: Clean tempest repository
+#  shell: rm -rf "{{ tempest_testfile }}"
+#  args:
+#    removes: "{{ tempest_testfile }}"
+
+- name: Initialize testr
+  command: testr init
+  args:
+    chdir: "{{ tempest_dir }}"
+    creates: "{{ tempest_testfile }}"
+  become: yes
+  become_user: stack
+
+- name: Display list of tests to be run with stestr
+  debug:
+    msg: Tempest tests list for "{{ project_name }}" = "{{ official_list }}"
+
+- name: Run Tempest tests on {{ project_name }}
+  shell: |
+    echo "Run Tempest tests on {{ project_name }}"
+    stestr run {{ official_list }} --subunit
+  args:
+    chdir: "{{ tempest_dir }}"
+  become: yes
+  become_user: stack
+
+    # - name: Collect tempest logs 
+  

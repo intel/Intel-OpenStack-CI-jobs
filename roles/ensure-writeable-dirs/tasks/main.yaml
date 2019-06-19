@@ -1,0 +1,15 @@
+- name: "Ensure directories are writeable by stack user"
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+    owner: stack
+    group: stack
+  with_items:
+    - "{{ output_dir }}"
+    - "{{ zuul_output_dir }}"
+    - "{{ zuul_output_dir }}/docs"
+    - "{{ zuul_output_dir }}/artifacts"
+    - "{{ zuul_output_dir }}/logs"
+    - "/opt/cache/files/"
+  become: yes

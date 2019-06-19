@@ -1,0 +1,50 @@
+- name: Print debug message
+  debug:
+    msg: "This role is going to write arbitrary logs to {{ output_dir }} !!!"
+
+- debug:
+    msg: "output_dir: {{ output_dir }}"
+
+# this is where the test scripts will "do stuff" which needs to be collected
+- name: Write date to "{{ output_dir }}/{{ testfile }}"
+  shell: echo "#{{ testfile }} = $(date +%Y%m%d%H%M%S)" > "{{ output_dir }}/{{ testfile }}"
+  become: yes
+  become_user: stack
+
+- name: Append data to "{{ output_dir }}/{{ testfile }}"
+  raw: for i in $(seq 0 10); do echo $i >> "{{ output_dir }}/{{ testfile }}"; done
+  become: yes
+  become_user: stack
+
+- name: Modify testfile name to testfile2.txt
+  set_fact:
+    testfile: "testfile2.txt"
+
+- name: Modify output_dir for new folder
+  set_fact:
+    output_dir: "{{ output_dir }}/data"
+
+- name: Create output directory
+  shell: mkdir -p {{ output_dir }}
+  become: yes
+  become_user: stack
+
+- name: Write date to "{{ output_dir }}/{{ testfile }}"
+  shell: echo "#{{ testfile }} = $(date +%Y%m%d%H%M%S)" > "{{ output_dir }}/{{ testfile }}"
+  become: yes
+  become_user: stack
+
+- name: Append data to "{{ output_dir }}/{{ testfile }}"
+  raw: for i in $(seq 0 10); do echo $i >> "{{ output_dir }}/{{ testfile }}"; done
+  become: yes
+  become_user: stack
+
+- name: Create an "artifact" in the artifacts directory ({{ zuul_output_dir }}/artifacts)
+  shell: echo "I am an artifact" > {{ zuul_output_dir }}/artifacts/artifact.txt
+  become: yes
+  become_user: stack
+
+- name: Create a "doc" in the doc directory ({{ output_dir }}/docs)
+  shell: echo "I am a doc" > {{ zuul_output_dir }}/docs/doc.txt
+  become: yes
+  become_user: stack

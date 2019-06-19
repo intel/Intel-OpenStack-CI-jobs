@@ -1,0 +1,11 @@
+# this task sets the stack user for the output files
+# to prevent a permissions error next time
+- name: Set stack user for output files
+  file:
+    path: "{{ zuul_output_dir }}"
+    state: directory
+    recurse: yes
+    owner: stack
+    group: stack
+  become: yes
+

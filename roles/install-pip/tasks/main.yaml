@@ -1,0 +1,57 @@
+- include_role:
+    name: ensure-pip-files
+
+- name: "installing pip"
+  debug:
+    msg: "Installing: requests, ipython, nose, twisted!"
+
+- apt:
+    name: python-pip
+    update_cache: yes
+    state: present
+
+- apt:
+    name: python3-pip
+    update_cache: yes
+    state: present
+
+- pip:
+    name: pip
+    state: present
+    version: 9.0.1
+
+- pip:
+    name: requests
+    state: present
+
+- pip:
+    name: ipython
+    state: present
+
+- pip:
+    name: nose
+    state: present
+
+- pip:
+    name: twisted
+    state: present
+
+- name: "installed pip"
+  debug: 
+    msg: "Installed: requests, ipython, nose, twisted!"
+
+- name: "Create sys_info_dir"
+  file:
+    path: "{{ sys_info_dir }}"
+    state: directory
+
+- name: "Create pip_info_log"
+  file:
+    path: "{{ pip_info_log }}"
+    state: touch
+
+- name: "Readout All Pips to pip_info_log"
+  shell: pip freeze | grep -i -v pip >> "{{ pip_info_log }}"
+
+- name: "Cat pip_info_log"
+  shell: cat "{{ pip_info_log }}"

@@ -1,0 +1,11 @@
+# this task sets the root user for the output files
+# to prevent an rsync chown error
+- name: Set root user for output files
+  file:
+    path: "{{ zuul_output_dir }}"
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+  become: yes
+

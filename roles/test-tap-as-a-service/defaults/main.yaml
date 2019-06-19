@@ -1,0 +1,11 @@
+project_name: "tap-as-a-service"
+# official_list: "neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring"
+# TODO: the above "regex" results in the error message:
+#  + TEST_NAME=neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring
+#  + stestr run neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring --subunit
+#  The specified regex doesn't match with anything+ echo
+# Workaround: using simplified test for now:
+official_list: "neutron_taas.tests.tempest_plugin.tests.*"
+tempest_dir: "{{ dest_dir }}/tempest"
+tempest_testfile: "{{tempest_dir}}/.testrepository"
+

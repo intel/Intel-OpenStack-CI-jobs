@@ -1,0 +1,16 @@
+# TODO:
+# - name: Detect host interface name
+
+- name: Prepare network interfaces for SR-IOV testing
+  vars:
+    num_vfs: 7
+    sriov_iface: ens801f0  # need to select the proper interface
+    # when sriov_iface not defined
+  shell: |
+    # clean up existing virtual functions
+    echo "0" > "/sys/class/net/{{ sriov_iface }}/device/sriov_numvfs"
+    ip link show {{ sriov_iface }}
+    echo "{{ num_vfs }}" > "/sys/class/net/{{ sriov_iface }}/device/sriov_numvfs"
+    ip link set up dev {{ sriov_iface }}
+    ip link show {{ sriov_iface }}
+  become: yes

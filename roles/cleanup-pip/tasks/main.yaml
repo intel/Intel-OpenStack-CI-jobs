@@ -1,0 +1,30 @@
+- include_role:
+    name: ensure-pip-files
+
+- name: "Cat pip_info_log"
+  shell: cat "{{ pip_info_log }}"
+  register: packages
+
+- name: "cleanup-pip uninstall"
+# pip: 
+#   requirements: "{{ item }}"
+#   state: absent
+  command: pip uninstall "{{ item }}" -y
+  loop: "{{ packages.stdout_lines | reject('match', '^pip==.*') | list }}"
+  become: yes
+
+# touch to clear pip_info_log
+- file:
+    path: "{{ pip_info_log }}"
+    state: touch 
+
+- name: "Readout Remaining Pips to pip_info_log"
+  shell: pip freeze >> "{{ pip_info_log }}"
+
+- name: "Cat output of previous task"
+  shell: cat "{{ pip_info_log }}"
+
+#- name: cleanup removes pip_info_log
+#  file:
+#    path: "{{ pip_info_log }}"
+#    state: absent

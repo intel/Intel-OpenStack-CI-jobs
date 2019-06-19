@@ -1,0 +1,13 @@
+- name: "Remove packages after devstack clean"
+  apt: 
+    name: "{{ item }}"
+    state: absent
+    purge: yes
+  with_items:
+    - apache2
+  become: yes
+
+- name: "Remove dependencies that are no longer required"
+  apt:
+    autoremove: yes
+  become: yes
