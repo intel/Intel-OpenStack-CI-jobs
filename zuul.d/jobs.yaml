@@ -18,7 +18,11 @@
           label: ubuntu-xenial-virt
     vars:
       test_command: "touch sriov_file"
-      devstack_dir: "/opt/stack/devstack"
+      dest_dir: "/opt/stack"
+      devstack_dir: "{{ dest_dir }}/devstack"
+      output_dir: "{{ zuul_output_dir }}/logs"
+      sys_info_dir: "{{ output_dir }}/sys_info"
+      pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
 
 - job:
     name: verify-dyn-test-success
