@@ -3,7 +3,7 @@
 - project:
     check:
       jobs:
-        - verify-dyn-test-success
+        - verify-test-success
 
 - job:
     name: verify-test-success
@@ -18,6 +18,7 @@
           label: ubuntu-xenial-virt
     vars:
       test_command: "touch sriov_file"
+      devstack_dir: "/opt/stack/devstack"
 
 - job:
     name: verify-dyn-test-success
