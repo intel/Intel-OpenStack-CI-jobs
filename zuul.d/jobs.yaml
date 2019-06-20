@@ -92,11 +92,11 @@
           label: ubuntu-bionic
     required-projects:
       # amend this to include project src as needed
-      - opendev.org/openstack/devstack
+      - openstack/devstack
     roles:
       # amend this to include project roles as needed
       - zuul: zuul/zuul-jobs
-      - zuul: opendev.org/openstack/devstack
+      - zuul: openstack/devstack
     pre-run: playbooks/base-intel/pre.yaml
     run: playbooks/base-intel-devstack/run.yaml
     post-run: playbooks/base-intel/post.yaml
