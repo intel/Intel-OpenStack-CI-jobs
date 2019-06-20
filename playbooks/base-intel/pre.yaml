@@ -1,0 +1,6 @@
+- hosts: all
+
+  roles:
+    # ensure devstack and log directories are writable by stack user
+    - ensure-writeable-dirs
+    - cleanup-after-devstack

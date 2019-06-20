@@ -1,0 +1,5 @@
+- hosts: all
+
+  roles:
+    # role inherited from opendev.org/openstack/devstack/
+    - run-devstack
