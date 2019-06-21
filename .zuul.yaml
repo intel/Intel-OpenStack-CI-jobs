@@ -2,6 +2,7 @@
     name: opendev/ci-sandbox
     check:
       jobs:
+        - smoketest
         - base-intel-no-devstack
 
 - project-template:
@@ -196,3 +197,12 @@
       nodes:
         - name: controller
           label: ubuntu-xenial-metal
+
+- job:
+    name: smoketest
+    description: |
+      minimal test to verify infra is working
+    pre-run: playbooks/base-intel/pre.yaml
+    run: playbooks/base-intel-no-devstack/run.yaml
+    post-run: playbooks/base-intel/post.yaml
+
