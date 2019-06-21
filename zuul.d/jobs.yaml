@@ -44,8 +44,9 @@
       on intel nic using tempest.
     required-projects:
       - opendev.org/x/tap-as-a-service
-      - opendev.org/devstack
-      - opendev.org/ci-sandbox
+      - opendev.org/openstack/devstack
+      - opendev.org/opendev/ci-sandbox
+      - opendev.org/openstack/neutron
     pre-run: playbooks/inteltaptest/pre.yaml
     run: playbooks/inteltaptest/run.yaml
     nodeset:
@@ -196,8 +197,8 @@
     run: playbooks/base-intel-no-devstack/run.yaml
     required-projects:
       - opendev.org/x/tap-as-a-service
-      - opendev.org/devstack
-      - opendev.org/ci-sandbox
+      - opendev.org/openstack/devstack
+      - opendev.org/opendev/ci-sandbox
       - opendev.org/openstack/neutron
     vars:
       testfile: testfile1.txt
