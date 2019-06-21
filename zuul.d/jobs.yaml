@@ -47,6 +47,8 @@
     description: |
       setup devstack and test port mirroring
       on intel nic using tempest.
+    required-projects:
+      - openstack/tap-as-a-service
     pre-run: playbooks/inteltaptest/pre.yaml
     run: playbooks/inteltaptest/run.yaml
     nodeset:
