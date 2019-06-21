@@ -70,11 +70,11 @@
       sys_info_dir: "{{ output_dir }}/sys_info"
       pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
 
-- job:
-    name: tap-as-a-service-tempest-plugin
-    parent: devstack-tempest
-    description: |
-      Perform setup common to all tap-as-a-service tempest tests
+#- job:
+#    name: tap-as-a-service-tempest-plugin
+#    parent: devstack-tempest
+#    description: |
+#      Perform setup common to all tap-as-a-service tempest tests
 
 
 - job:
@@ -160,36 +160,36 @@
         # tox.ini file
         '{{ output_dir }}/dsvm-functional-logs': logs
 
-- job:
-    name: base-intel-no-devstack
-    parent: base-intel-devstack
-    description: |
-      minimal job including devstack pre/post
-      Inherit from this job if you just need base
-      pre and post playbooks.
-      Variables including paths and passwords should
-      be mirrored with base-intel-devstack
-    run: playbooks/base-intel-no-devstack/run.yaml
-    vars:
-      testfile: testfile1.txt
+#- job:
+#    name: base-intel-no-devstack
+#    parent: base-intel-devstack
+#    description: |
+#      minimal job including devstack pre/post
+#      Inherit from this job if you just need base
+#      pre and post playbooks.
+#      Variables including paths and passwords should
+#      be mirrored with base-intel-devstack
+#    run: playbooks/base-intel-no-devstack/run.yaml
+#    vars:
+#      testfile: testfile1.txt
 
-- job:
-    name: test-baremetal
-    parent: base-intel-no-devstack
-    description: |
-      minimal job including devstack pre/post
-    run: playbooks/base-intel-no-devstack/run.yaml
-    required-projects:
-      - opendev.org/x/tap-as-a-service
-      - opendev.org/openstack/devstack
-      - opendev.org/opendev/ci-sandbox
-      - opendev.org/openstack/neutron
-    vars:
-      testfile: testfile1.txt
-    nodeset:
-      nodes:
-        - name: controller
-          label: ubuntu-xenial-metal
+#- job:
+#    name: test-baremetal
+#    parent: base-intel-no-devstack
+#    description: |
+#      minimal job including devstack pre/post
+#    run: playbooks/base-intel-no-devstack/run.yaml
+#    required-projects:
+#      - opendev.org/x/tap-as-a-service
+#      - opendev.org/openstack/devstack
+#      - opendev.org/opendev/ci-sandbox
+#      - opendev.org/openstack/neutron
+#    vars:
+#      testfile: testfile1.txt
+#    nodeset:
+#      nodes:
+#        - name: controller
+#          label: ubuntu-xenial-metal
 
 - job:
     name: smoketest
