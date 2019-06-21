@@ -203,6 +203,7 @@
       - opendev/x/tap-as-a-service
       - opendev/devstack
       - opendev/ci-sandbox
+      - openstack/neutron
     vars:
       testfile: testfile1.txt
     nodeset:

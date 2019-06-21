@@ -1,0 +1,6 @@
+- project:
+    name: opendev/ci-sandbox
+    check:
+      jobs:
+        - test-baremetal
+
