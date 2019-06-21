@@ -206,7 +206,3 @@
       - openstack/neutron
     vars:
       testfile: testfile1.txt
-    nodeset:
-      nodes:
-        - name: controller
-          label: ubuntu-xenial-metal
