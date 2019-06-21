@@ -48,7 +48,9 @@
       setup devstack and test port mirroring
       on intel nic using tempest.
     required-projects:
-      - openstack/tap-as-a-service
+      - opendev/x/tap-as-a-service
+      - opendev/devstack
+      - opendev/ci-sandbox
     pre-run: playbooks/inteltaptest/pre.yaml
     run: playbooks/inteltaptest/run.yaml
     nodeset:
@@ -191,3 +193,19 @@
     vars:
       testfile: testfile1.txt
 
+- job:
+    name: test-baremetal
+    parent: base-intel-no-devstack
+    description: |
+      minimal job including devstack pre/post
+    run: playbooks/base-intel-no-devstack/run.yaml
+    required-projects:
+      - opendev/x/tap-as-a-service
+      - opendev/devstack
+      - opendev/ci-sandbox
+    vars:
+      testfile: testfile1.txt
+    nodeset:
+      nodes:
+        - name: controller
+          label: ubuntu-xenial-metal
