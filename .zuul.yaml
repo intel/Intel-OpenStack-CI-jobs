@@ -2,7 +2,7 @@
     name: opendev/ci-sandbox
     check:
       jobs:
-        - test-baremetal
+        - base-intel-no-devstack
 
 - project-template:
     name: openstack-taas-jobs
