@@ -53,6 +53,7 @@
 
 - job:
     name: tap-as-a-service-dsvm-intel-sriov
+    parent: base
     description: |
       setup devstack and test port mirroring
       on intel nic using tempest.
