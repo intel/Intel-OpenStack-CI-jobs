@@ -237,9 +237,10 @@
       - zuul: zuul/zuul-jobs
       - zuul: opendev.org/openstack/devstack
     pre-run: playbooks/base-intel/pre.yaml
-    run: playbooks/taas/run-taas.yaml
+    run: playbooks/inteltaptest/run-taas-sriov.yaml
     post-run: playbooks/base-intel/post.yaml
     vars:
+      # sriov_iface below belongs to: 3.11
       sriov_iface: ens785f1
       # NOTE: The list below does not work yet but is the correct list
       # official_list: "neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring"
