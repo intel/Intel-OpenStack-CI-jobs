@@ -46,31 +46,6 @@
       jobs: []
 
 - job:
-    name: tap-as-a-service-dsvm-intel-sriov-wip
-    parent: base
-    description: |
-      setup devstack and test port mirroring
-      on intel nic using tempest.
-    required-projects:
-      - opendev.org/x/tap-as-a-service
-      - opendev.org/openstack/devstack
-      - opendev.org/opendev/ci-sandbox
-      - opendev.org/openstack/neutron
-    pre-run: playbooks/inteltaptest/pre.yaml
-    run: playbooks/inteltaptest/run.yaml
-    nodeset:
-      nodes:
-        - name: controller
-          label: ubuntu-xenial-metal
-    vars:
-      test_command: "touch sriov_file"
-      dest_dir: "/opt/stack"
-      devstack_dir: "{{ dest_dir }}/devstack"
-      output_dir: "{{ zuul_output_dir }}/logs"
-      sys_info_dir: "{{ output_dir }}/sys_info"
-      pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
-
-- job:
     name: tap-as-a-service-tempest-plugin
     parent: devstack-tempest
     description: |
@@ -181,6 +156,7 @@
       on intel nic using tempest.
     required-projects:
       - opendev.org/x/tap-as-a-service
+      - opendev.org/x/tap-as-a-service-tempest-plugin
       - opendev.org/openstack/devstack
       - opendev.org/opendev/ci-sandbox
       - opendev.org/openstack/neutron
