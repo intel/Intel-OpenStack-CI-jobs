@@ -144,7 +144,6 @@
 
 - job:
     name: smoketest
-    parent: null
     description: |
       minimal test to verify infra is working
     pre-run: playbooks/base-intel/pre.yaml
