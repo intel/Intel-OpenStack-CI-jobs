@@ -4,6 +4,18 @@
       Runs Sriov job on tap-as-a-service project
     check:
       jobs:
+        - tap-as-a-service-wip-sriov-wip:
+            branches: master
+            irrelevant-files:
+              - ^(test-|)requirements.txt$
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^neutron/locale/.*$
+              - ^neutron/tests/unit/.*$
+              - ^releasenotes/.*$
+              - ^setup.cfg$
+              - ^tools/.*$
+              - ^tox.ini$
         - tap-as-a-service-dsvm-intel-sriov:
             branches: master
             irrelevant-files:
