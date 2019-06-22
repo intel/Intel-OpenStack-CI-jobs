@@ -17,6 +17,7 @@
               - ^tools/.*$
               - ^tox.ini$
 
+# TODO: Is this job necessary?
 - project-template:
     name: openstack-lower-constraints-jobs
     description: |
@@ -44,13 +45,6 @@
     # and we can report invalid zuul.yaml files.
     check:
       jobs: []
-
-- job:
-    name: tap-as-a-service-tempest-plugin
-    parent: devstack-tempest
-    description: |
-      Perform setup common to all tap-as-a-service tempest tests
-
 
 - job:
     name: base-intel-devstack
@@ -149,6 +143,31 @@
       testfile: testfile1.txt
 
 - job:
+    name: smoketest
+    parent: null
+    description: |
+      minimal test to verify infra is working
+    pre-run: playbooks/base-intel/pre.yaml
+    run: playbooks/base-intel-no-devstack/run.yaml
+    post-run: playbooks/base-intel/post.yaml
+    vars:
+      ansible_user_dir: /srv/static/ansible_user_logs/
+      dest_dir: "/opt/stack"
+      devstack_dir: "{{ dest_dir }}/devstack"
+      devstack_repo: git://github.com/openstack-dev/devstack.git
+      devstack_version: "master"
+      host_ip: "{{ ansible_default_ipv4.address }}"
+      no_log: false
+      os_password: devstack
+      outfile: "{{ output_dir }}/{{ testfile }}"
+      output_dir: "{{ zuul_output_dir }}/logs"
+      pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
+      sys_info_dir: "{{ output_dir }}/sys_info"
+      userlogfile: "{{ ansible_user_dir }}/user_output_log.txt"
+      zuul_log_verbose: true
+      zuul_output_dir: /srv/static/logs
+
+- job:
     name: tap-as-a-service-dsvm-intel-sriov
     parent: base
     description: |
@@ -174,12 +193,17 @@
       sys_info_dir: "{{ output_dir }}/sys_info"
       pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
 
+- job:
+    name: tap-as-a-service-tempest-plugin
+    parent: devstack-tempest
+    description: |
+      Perform setup common to all tap-as-a-service tempest tests
 
 - job:
     name: test-baremetal
     parent: base-intel-no-devstack
     description: |
-      minimal job including devstack pre/post
+      minimal job including devstack pre/post to exercise test node
     run: playbooks/base-intel-no-devstack/run.yaml
     required-projects:
       - opendev.org/x/tap-as-a-service
@@ -194,27 +218,177 @@
           label: ubuntu-xenial-metal
 
 - job:
-    name: smoketest
-    description: |
-      minimal test to verify infra is working
+    name: tap-as-a-service-sriov-wip
+    parent: base-intel-devstack
+    description: Run TaaS job on 3rd party CI Hardware
+    nodeset:
+      nodes:
+        - name: ubuntu-xenial-metal
+          label: ubuntu-xenial-metal
+          # 3.11: sriov_iface=ens785f1
+          # 3.12: sriov_iface=ens801f0
+          # New nodes need separate interface defined or detected
+    required-projects:
+      # NOTE: the following projects must also be present in Zuul's tenant config (etc_zuul/main.yaml)
+      - opendev.org/openstack/devstack
+      - opendev.org/openstack/neutron
+      - opendev.org/x/tap-as-a-service
+      - opendev.org/x/tap-as-a-service-tempest-plugin
+    roles:
+      - zuul: zuul/zuul-jobs
+      - zuul: opendev.org/openstack/devstack
     pre-run: playbooks/base-intel/pre.yaml
-    run: playbooks/base-intel-no-devstack/run.yaml
+    run: playbooks/taas/run-taas.yaml
     post-run: playbooks/base-intel/post.yaml
     vars:
-      ansible_user_dir: /srv/static/ansible_user_logs/
-      dest_dir: "/opt/stack"
-      devstack_dir: "{{ dest_dir }}/devstack"
-      devstack_repo: git://github.com/openstack-dev/devstack.git
-      devstack_version: "master"
-      # TODO: detect host IP from zuul vars
-      host_ip: "{{ ansible_default_ipv4.address }}"
-      no_log: false
-      os_password: devstack
-      outfile: "{{ output_dir }}/{{ testfile }}"
-      output_dir: "{{ zuul_output_dir }}/logs"
-      pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
-      sys_info_dir: "{{ output_dir }}/sys_info"
-      userlogfile: "{{ ansible_user_dir }}/user_output_log.txt"
-      zuul_log_verbose: true
-      zuul_output_dir: /srv/static/logs
+      sriov_iface: ens785f1
+      # NOTE: The list below does not work yet but is the correct list
+      # official_list: "neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring"
+      # NOTE: the list below is to setup the job.  It should be teplaced when the correct list above is working
+      official_list: "neutron_taas.tests.tempest_plugin.tests.*"
+      devstack_services:
+          ## Ignore any default set by devstack. Emit a "disable_all_services".
+          #base: false
+        # Glance services
+        g-api: true
+        g-reg: true
+        # Keystone services
+        key: true
+        # Nova services
+        n-api: true
+        n-api-meta: true
+        n-cauth: true
+        n-cond: true
+        n-cpu: true
+        n-novnc: true
+        n-obj: true
+        n-sch: true
+        n-novnc-cell1: true
+        n-super-cond: true
+        n-cond-cell1: true
+        placement: true
+        placement-api: true
+        placement-client: true
+        # Neutron services
+        neutron: true
+        q-agt: true
+        q-dhcp: true
+        q-l3: true
+        q-meta: true
+        q-sriov-agt: true
+        q-svc: true
+        # Tap-as-a-service services
+        taas: true
+        taas-agent: true
+        # Tempest
+        tempest: true
+        # Explicitly disable services
+        # Cinder
+        c-api: false
+        c-sch: false
+        c-vol: false
+        # Horizon
+        horizon: false
+      devstack_localrc:
+        # the following are specific to TaaS local.conf
+        # TaaS-sprcific configuration
+        OVS_TUNNEL_BRIDGE: br-tun
+        OVS_ENABLE_TUNNELING: true
+        # we don't want GRE so disable tenant tunnels
+        ENABLE_TENANT_TUNNELS: false
+        ENABLE_TENANT_VLANS: true
+        ERROR_ON_CLONE: false
+        TENANT_VLAN_RANGE: "3001:4000"
+        PHYSICAL_NETWORK: physnet
+        Q_USE_PROVIDER_NETWORKING: false
+        Q_L3_ENABLED: true
+        PROVIDER_NETWORK_TYPE: "vlan"
+        SEGMENTATION_ID: 2010
+        # Neutron ML2 with OpenVSwitch (while trying to enable br-tun)
+        Q_PLUGIN: ml2
+        Q_AGENT: openvswitch
+        Q_ML2_PLUGIN_MECHANISM_DRIVERS: "l2population,openvswitch,sriovnicswitch"
+        Q_ML2_PLUGIN_TYPE_DRIVERS: "local,flat,vlan,vxlan"
+        Q_PLUGIN_CONF_PATH: "/etc/neutron/plugins/ml2"
+        Q_PLUGIN_EXTRA_CONF_FILES: "plugins/ml2/sriov_agent.ini"
+        # tap-as-a-service:
+        LIBS_FROM_GIT: "nova,devstack-gate,requirements,neutron,tempest,swift,placement,cinder,glance,tap-as-a-service-tempest-plugin,devstack,keystone,tap-as-a-service"
+        TAAS_SERVICE_DRIVER: "TAAS:TAAS:neutron_taas.services.taas.service_drivers.taas_rpc.TaasRpcDriver:default"
+        IMAGE_URLS: "http://uec-images.ubuntu.com/releases/14.04/release/ubuntu-14.04-server-cloudimg-amd64-disk1.img"
+      devstack_plugins:
+        # from local.conf: enable_plugin tap-as-a-service /opt/stack/tap-as-a-service
+        tap-as-a-service: https://opendev.org/x/tap-as-a-service
+        # this plugin will end up in {{ ansible_user_dir }}/src/opendev.org/x/tap-as-a-service-tempest-plugin
+        # TODO: copy from here to setup for the job
+        #TEMPEST_PLUGINS="/opt/stack/tap-as-a-service-tempest-plugin"
+        tap-as-a-service-tempest-plugin: https://opendev.org/x/tap-as-a-service-tempest-plugin
+        # from local.conf: enable_plugin neutron https://git.openstack.org/openstack/neutron.git
+        neutron: https://opendev.org/openstack/neutron
+      devstack_plugins:
+        # from local.conf: enable_plugin tap-as-a-service /opt/stack/tap-as-a-service
+        tap-as-a-service: https://opendev.org/x/tap-as-a-service
+        # this plugin will end up in {{ ansible_user_dir }}/src/opendev.org/x/tap-as-a-service-tempest-plugin
+        # TODO: copy from here to setup for the job
+        #TEMPEST_PLUGINS="/opt/stack/tap-as-a-service-tempest-plugin"
+        tap-as-a-service-tempest-plugin: https://opendev.org/x/tap-as-a-service-tempest-plugin
+        # from local.conf: enable_plugin neutron https://git.openstack.org/openstack/neutron.git
+        neutron: https://opendev.org/openstack/neutron
+      devstack_local_conf:
+        post-config:
+          $NOVA_CONF:
+            filter_scheduler:
+              enabled_filters: "RetryFilter,AvailabilityZoneFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter,PciPassthroughFilter,NUMATopologyFilter"
+              available_filters: "nova.scheduler.filters.all_filters"
+            # TODO: Figure out the syntax for the item below. This string is complex
+            # NOTE: the quotes in the following line MUST be preserved for this to work
+            # See: https://wiki.openstack.org/wiki/SR-IOV-Passthrough-For-Networking
+            # from local.conf: passthrough_whitelist = { "'"devname"'": "'"$SRIOV_ETH"'", "'"physical_network"'": "'"physnet"'" }
+            pci:
+              passthrough_whitelist: '{ "devname": "{{ sriov_iface }}", "physical_network": "physnet" }'
+          # see Neutron job config for an example of how to deal with the following line:
+          # https://github.com/openstack/neutron/blob/6ceba7aa47ec21d45b52d55891abf3bd4cf9d6cc/.zuul.yaml#L359
+          # TODO: Upstream Neutron jobs use NEUTRON_CORE_PLUGIN_CONF here.  Is the below correct?
+          "/$Q_PLUGIN_CONF_FILE":
+            agent:
+              extensions: fdb
+            FDB:
+              shared_physical_device_mappings: "physnet:{{ sriov_iface }}"
+            ml2_sriov:
+              agent_required: true
+            securitygroup:
+              firewall_driver: "neutron.agent.firewall.NoopFirewallDriver"
+              ml2_type_vlan:
+                network_vlan_ranges: physnet
+          # TODO: can we enter paths here?? /etc/neutron/plugins/ml2/sriov_agent.ini
+          $SRIOV_AGENT_CONF_FILE:
+            sriov_nic:
+              physical_device_mappings: "physnet:{{ sriov_iface }}"
+            securitygroup:
+              firewall_driver: "neutron.agent.firewall.NoopFirewallDriver"
+          # TODO: is the following the correct variable for /etc/neutron/l3_agent.ini ?
+          $NEUTRON_L3_CONF:
+            DEFAULT:
+              external_network_bridge: br-ex
+        test-config:
+          $TEMPEST_CONFIG:
+            auth:
+              use_dynamic_credentials: true
+              tempest_roles: admin
+              admin_domain_name: Default
+              admin_project_name: admin
+              admin_password: "{{ os_password }}"
+              admin_username: admin
+            taas_plugin_options:
+              provider_physical_network: physnet
+              provider_segmentation_id: 1020
+              vlan_filter: 1020
+            network:
+              port_vnic_type: direct
+            network-feature-enabled:
+              api_extensions: "dhcp_agent_scheduler,taas,taas-vlan-filter,external-net,ext-gw-mode,binding,quotas,agent,l3_agent_scheduler,provider,router,extraroute,network,security-group,qos"
+            #port-security,qos
+            validation:
+              ssh_timeout: 300
+              ping_timeout: 400
+
 
