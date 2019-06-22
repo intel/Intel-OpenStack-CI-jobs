@@ -324,15 +324,6 @@
         tap-as-a-service-tempest-plugin: https://opendev.org/x/tap-as-a-service-tempest-plugin
         # from local.conf: enable_plugin neutron https://git.openstack.org/openstack/neutron.git
         neutron: https://opendev.org/openstack/neutron
-      devstack_plugins:
-        # from local.conf: enable_plugin tap-as-a-service /opt/stack/tap-as-a-service
-        tap-as-a-service: https://opendev.org/x/tap-as-a-service
-        # this plugin will end up in {{ ansible_user_dir }}/src/opendev.org/x/tap-as-a-service-tempest-plugin
-        # TODO: copy from here to setup for the job
-        #TEMPEST_PLUGINS="/opt/stack/tap-as-a-service-tempest-plugin"
-        tap-as-a-service-tempest-plugin: https://opendev.org/x/tap-as-a-service-tempest-plugin
-        # from local.conf: enable_plugin neutron https://git.openstack.org/openstack/neutron.git
-        neutron: https://opendev.org/openstack/neutron
       devstack_local_conf:
         post-config:
           $NOVA_CONF:
