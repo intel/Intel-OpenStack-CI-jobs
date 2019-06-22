@@ -183,7 +183,7 @@
     nodeset:
       nodes:
         - name: controller
-          label: ubuntu-xenial-metal
+          label: ubuntu-xenial-metal-sriov
     vars:
       test_command: "touch sriov_file"
       dest_dir: "/opt/stack"
