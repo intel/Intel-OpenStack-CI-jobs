@@ -279,7 +279,7 @@
         q-svc: true
         # Tap-as-a-service services
         taas: true
-        taas-agent: true
+        taas_agent: true
         # Tempest
         tempest: true
         # Explicitly disable services
