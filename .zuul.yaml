@@ -243,9 +243,9 @@
       # sriov_iface below belongs to: 3.11
       sriov_iface: ens785f1
       # NOTE: The list below does not work yet but is the correct list
-      # official_list: "neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring"
       # NOTE: the list below is to setup the job.  It should be teplaced when the correct list above is working
-      official_list: "neutron_taas.tests.tempest_plugin.tests.*"
+      # official_list: "neutron_taas.tests.tempest_plugin.tests.*"
+      official_list: "neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring"
       devstack_services:
           ## Ignore any default set by devstack. Emit a "disable_all_services".
           #base: false
