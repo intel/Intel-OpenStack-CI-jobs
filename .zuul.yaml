@@ -130,6 +130,50 @@
         '{{ output_dir }}/dsvm-functional-logs': logs
 
 - job:
+    name: i-devstack-tempest
+    parent: base-intel-devstack
+    description: |
+      Base Intel Tempest job
+
+      This is a parallel job to upstream devstack-tempest
+      https://opendev.org/openstack/tempest/src/branch/master/.zuul.yaml
+    nodeset: openstack-single-node-bionic
+    required-projects:
+      - opendev.org/openstack/tempest
+    roles:
+      - zuul: zuul/zuul-jobs
+      - zuul: opendev.org/openstack/devstack
+      - zuul: opendev.org/openstack/tempest
+    vars:
+      # try fiddling with these
+      devstack_repo: https://opendev.org/openstack/devstack.git
+      zuul_output_dir: /srv/static
+      devstack_services:
+        tempest: true
+      devstack_localrc:
+        GIT_BASE: "https://opendev.org"
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            compute:
+              min_compute_nodes: "{{ groups['compute'] | default(['controller']) | length }}"
+      test_results_stage_name: test_results
+      zuul_copy_output:
+        '{{ devstack_base_dir }}/tempest/etc/tempest.conf': logs
+        '{{ devstack_base_dir }}/tempest/etc/accounts.yaml': logs
+        '{{ devstack_base_dir }}/tempest/tempest.log': logs
+        '{{ stage_dir }}/{{ test_results_stage_name }}.subunit': logs
+        '{{ stage_dir }}/{{ test_results_stage_name }}.html': logs
+        '{{ stage_dir }}/stackviz': logs
+      extensions_to_txt:
+        conf: true
+        log: true
+        yaml: true
+        yml: true
+    run: playbooks/tempest/devstack-tempest.yaml
+    post-run: playbooks/tempest/post-tempest.yaml
+
+- job:
     name: base-intel-no-devstack
     parent: base-intel-devstack
     description: |
@@ -165,6 +209,44 @@
       userlogfile: "{{ ansible_user_dir }}/user_output_log.txt"
       zuul_log_verbose: true
       zuul_output_dir: /srv/static/logs
+
+- job:
+    name: test-tempest-full-py2
+    parent: i-devstack-tempest
+    description: |
+      Base integration test with python2
+
+      This is a parallel job to upstream tempest-full
+      https://opendev.org/openstack/tempest/src/branch/master/.zuul.yaml
+    vars:
+      tox_envlist: full
+      # tempest_test_regex: tempest
+      devstack_localrc:
+        ENABLE_FILE_INJECTION: true
+        ENABLE_VOLUME_MULTIATTACH: true
+
+- job:
+    name: test-tempest-full-py3
+    parent: i-devstack-tempest
+    description: |
+      Base integration test with python3
+
+      This is a parallel job to upstream tempest-full-py3
+      https://opendev.org/openstack/tempest/src/branch/master/.zuul.yaml
+    vars:
+      tox_envlist: full
+      # tempest_test_regex: tempest
+      devstack_localrc:
+        USE_PYTHON3: true
+        ENABLE_FILE_INJECTION: true
+        ENABLE_VOLUME_MULTIATTACH: true
+      devstack_services:
+        s-account: false
+        s-container: false
+        s-object: false
+        s-proxy: false
+        # without Swift, c-bak cannot run (in the Gate at least)
+        c-bak: false
 
 - job:
     name: tap-as-a-service-dsvm-intel-sriov
@@ -218,11 +300,11 @@
 
 - job:
     name: tap-as-a-service-sriov-wip
-    parent: base-intel-devstack
+    parent: test-tempest-full-py3
     description: Run TaaS job on 3rd party CI Hardware
     nodeset:
       nodes:
-        - name: ubuntu-xenial-metal
+        - name: controller
           label: ubuntu-xenial-metal
           # 3.11: sriov_iface=ens785f1
           # 3.12: sriov_iface=ens801f0
@@ -233,9 +315,11 @@
       - opendev.org/openstack/neutron
       - opendev.org/x/tap-as-a-service
       - opendev.org/x/tap-as-a-service-tempest-plugin
+      - opendev.org/openstack/tempest
     roles:
       - zuul: zuul/zuul-jobs
       - zuul: opendev.org/openstack/devstack
+      - zuul: opendev.org/openstack/neutron
     pre-run: playbooks/base-intel/pre.yaml
     run: playbooks/inteltaptest/run-taas-sriov.yaml
     post-run: playbooks/base-intel/post.yaml
@@ -243,8 +327,8 @@
       # sriov_iface below belongs to: 3.11
       sriov_iface: ens785f1
       # NOTE: The list below does not work yet but is the correct list
-      # NOTE: the list below is to setup the job.  It should be teplaced when the correct list above is working
-      # official_list: "neutron_taas.tests.tempest_plugin.tests.*"
+      # NOTE: the list below is to setup the job.  It should be replaced when the correct list above is working
+      #official_list: "neutron_taas.tests.tempest_plugin.tests.*"
       official_list: "neutron_taas_tempest_plugin.tests.scenario.test_taas.TestTaaS.test_tap_flow_data_mirroring"
       devstack_services:
           ## Ignore any default set by devstack. Emit a "disable_all_services".
@@ -315,6 +399,7 @@
         LIBS_FROM_GIT: "nova,devstack-gate,requirements,neutron,tempest,swift,placement,cinder,glance,tap-as-a-service-tempest-plugin,devstack,keystone,tap-as-a-service"
         TAAS_SERVICE_DRIVER: "TAAS:TAAS:neutron_taas.services.taas.service_drivers.taas_rpc.TaasRpcDriver:default"
         IMAGE_URLS: "http://uec-images.ubuntu.com/releases/14.04/release/ubuntu-14.04-server-cloudimg-amd64-disk1.img"
+        TEMPEST_PLUGINS: "{{ dest_dir }}/tap-as-a-service-tempest-plugin"
       devstack_plugins:
         # from local.conf: enable_plugin tap-as-a-service /opt/stack/tap-as-a-service
         tap-as-a-service: https://opendev.org/x/tap-as-a-service
