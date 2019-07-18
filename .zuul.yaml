@@ -4,7 +4,7 @@
       Runs Sriov job on tap-as-a-service project
     check:
       jobs:
-        - tap-as-a-service-dsvm-intel-sriov:
+        - tap-as-a-service-sriov-wip:
             branches: master
             irrelevant-files:
               - ^(test-|)requirements.txt$
@@ -304,7 +304,7 @@
     description: Run TaaS job on 3rd party CI Hardware
     nodeset:
       nodes:
-        - name: controller
+        - name: tempest
           label: ubuntu-xenial-metal
           # 3.11: sriov_iface=ens785f1
           # 3.12: sriov_iface=ens801f0
