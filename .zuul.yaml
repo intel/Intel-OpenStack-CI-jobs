@@ -4,7 +4,7 @@
       Runs Sriov job on tap-as-a-service project
     check:
       jobs:
-        - tap-as-a-service-dsvm-intel-sriov:
+        - tap-as-a-service-sriov-wip:
             branches: master
             irrelevant-files:
               - ^(test-|)requirements.txt$
@@ -325,7 +325,7 @@
     post-run: playbooks/base-intel/post.yaml
     vars:
       # sriov_iface below belongs to: 3.11
-      sriov_iface: ens785f1
+      sriov_iface: ens801f0
       # NOTE: The list below does not work yet but is the correct list
       # NOTE: the list below is to setup the job.  It should be replaced when the correct list above is working
       #official_list: "neutron_taas.tests.tempest_plugin.tests.*"

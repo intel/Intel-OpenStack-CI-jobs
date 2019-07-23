@@ -1,0 +1,8 @@
+- hosts: tempest
+  become: true
+  roles:
+    # from zuul/zuul-jobs
+    # - role: fetch-subunit-output
+      # zuul_work_dir: '{{ devstack_base_dir }}/tempest'
+    # from tempest
+    - role: process-stackviz
