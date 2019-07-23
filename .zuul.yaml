@@ -305,7 +305,7 @@
     nodeset:
       nodes:
         - name: controller
-          label: ubuntu-xenial-metal
+          label: metal-static-xenial-x710
           # 3.11: sriov_iface=ens785f1
           # 3.12: sriov_iface=ens801f0
           # New nodes need separate interface defined or detected
