@@ -570,7 +570,7 @@
 
 - job:
     name: pmem-tempest-plugin-filtered
-    parent: devstack-minimal
+    parent: pmem-tempest-plugin
     description: |
       Run virtual pmem tempest plugin tests.
       Only trigger this job on specific file changes
