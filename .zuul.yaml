@@ -568,3 +568,13 @@
     run: playbooks/pmem/run.yaml
     post-run: playbooks/tempest/post-tempest.yaml
 
+- job:
+    name: pmem-tempest-plugin-filtered
+    parent: devstack-minimal
+    description: |
+      Run virtual pmem tempest plugin tests.
+      Only trigger this job on specific file changes
+    files:
+      - ^doc/source/admin/.*$
+      - ^nova/compute/manager.py
+
