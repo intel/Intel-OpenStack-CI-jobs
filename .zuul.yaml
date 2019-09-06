@@ -574,6 +574,10 @@
     description: |
       Run virtual pmem tempest plugin tests.
       Only trigger this job on specific file changes
+    nodeset:
+      nodes:
+        - name: controller
+          label: vm-dyn-aep
     files:
       - ../../../opendev.org/openstack/nova/doc/source/admin/.*
       - ../../../opendev.org/openstack/nova/nova/compute/manager.py
