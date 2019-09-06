@@ -1,0 +1,24 @@
+- hosts: all
+  tasks:
+    - name: load kvm modules
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - kvm
+        - kvm-intel
+  roles:
+    - create-pmem-namespace
+    # from devstack
+    - run-devstack
+    - upgrade-libvirt-qemu
+
+# Only on one node
+- hosts: all
+  roles:
+    # from tempest
+    - setup-tempest-run-dir
+    - setup-tempest-data-dir
+    - acl-devstack-files
+    - install-pmem-tempest-plugin
+    - run-tempest

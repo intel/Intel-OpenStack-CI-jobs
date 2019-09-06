@@ -1,0 +1,8 @@
+- name: clone vpmem tempest plugin
+  shell: git clone https://github.com/LuyaoZhong/vpmem-tempest-plugin "{{ dest_dir }}/vpmem-tempest-plugin"
+  become: true
+  become_user: stack
+
+- name: install vpmem tempest plugin
+  shell: source "{{dest_dir}}/tempest/.tox/venv/bin/activate"; pip install -e "{{ dest_dir }}/vpmem-tempest-plugin/"
+  become: true

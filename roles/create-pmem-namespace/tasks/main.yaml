@@ -1,0 +1,23 @@
+- name: init labels
+  shell: ndctl disable-region 0 && ndctl zero-labels all && ndctl init-labels all && ndctl enable-region  0
+  become: true
+
+- name: create pmem namespace0
+  shell: ndctl create-namespace -m devdax -n ns0 -a 2M -s 1G --force
+  become: true
+
+- name: create pmem namespace1
+  shell: ndctl create-namespace -m devdax -n ns1 -a 2M -s 1G --force
+  become: true
+
+- name: create pmem namespace2
+  shell: ndctl create-namespace -m devdax -n ns2 -a 2M -s 1G --force
+  become: true
+
+- name: create pmem namespace3
+  shell: ndctl create-namespace -m devdax -n ns3 -a 2M -s 1G --force
+  become: true
+
+- name: create pmem namespace4
+  shell: ndctl create-namespace -m devdax -n ns4 -a 2M -s 1G --force
+  become: true

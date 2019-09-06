@@ -1,0 +1,125 @@
+- name: uninstall qemu
+  shell: yes | apt purge qemu* ipxe-qemu
+  become: true
+
+- name: uninstall libvirt
+  shell: yes | apt purge libvirt*
+  become: true
+
+- name: install dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - pkg-config
+    - libglibmm-2.4-dev
+    - libpixman-1-dev
+    - libnuma-dev
+    - pmdk-tools
+    - libpmem-dev
+    - libaio-dev
+    - libgnutls28-dev
+    - libnl-3-dev
+    - libnl-route-3-dev
+    - libxml2-dev
+    - libyajl-dev
+    - libxml2-utils
+    - xsltproc
+    - libdevmapper-dev
+    - libpciaccess-dev
+    - libxen-dev
+  become: true
+
+- name: install qemu
+  shell: /usr/bin/dpkg -i /pmem-ci/qemu_3.1.0-1_amd64.deb
+  become: true
+
+- name: install libvirt
+  shell: /usr/bin/dpkg -i /pmem-ci/libvirt_5.0.0-1_amd64.deb
+  become: true
+
+- name: configure libvirtd
+  blockinfile:
+    path: /etc/libvirt/libvirtd.conf
+    block: |
+      unix_sock_group = "libvirt"
+      unix_sock_ro_perms = "0777"
+      unix_sock_rw_perms = "0777"
+      auth_unix_ro = "none"
+      auth_unix_rw = "none"
+      log_filters="1:libvirt.c 1:qemu 1:conf 1:security 3:object 3:event 3:json 3:file 1:util 1:cpu"
+      log_outputs="1:file:/var/log/libvirt/libvirtd.log"
+  become: true
+
+- name: add group 'libvirt'
+  group:
+    name: 'libvirt'
+  become: true
+
+- name: add user 'stack' to group 'libvirt'
+  user:
+    name: stack
+    groups: libvirt
+  become: true
+
+#- name: remove stale libvirt libraries
+#  shell: rm -rf /usr/lib/x86_64-linux-gnu/libvirt*
+#  become: true
+
+#- name: restart libvirt services
+#  shell: systemctl daemon-reload; systemctl reload libvirtd.service; systemctl restart libvirtd.service; systemctl restart virt*
+#  become: true
+
+- name: daemon-reload
+  systemd:
+    daemon-reload: yes
+  become: true
+
+- name: reload libvirtd
+  systemd:
+    name: libvirtd.service
+    state: reloaded
+  become: true
+
+- name: restart libvirtd
+  systemd:
+    name: libvirtd.service
+    state: restarted
+  become: true
+
+- name: restart other virt daemons
+  systemd:
+    name: virt*
+    state: restarted
+  become: true
+
+- name: inject pmem configuration
+  lineinfile:
+    insertafter: '^virt_type = kvm'
+    line: 'pmem_namespaces = 4GB:ns0|ns1|ns2|ns3,16GB:ns4'
+    path: /etc/nova/nova-cpu.conf
+  become: true
+  become_user: stack
+
+- name: apply vpmem patch
+  shell: cd /opt/stack/nova && git fetch https://review.opendev.org/openstack/nova refs/changes/70/678470/13 && git checkout FETCH_HEAD && git checkout -b vpmem
+  become: true
+  become_user: stack
+
+- name: upgrade DB
+  shell: nova-manage  --config-file /etc/nova/nova_cell1.conf  db sync  --local_cell
+  become: true
+  become_user: stack
+
+- name: restart nova services
+  systemd:
+    name: devstack@n-*.service
+    state: restarted
+  become: true
+
+#- name: restart n-cpu
+#  systemd:
+#    name: devstack@n-cpu.service
+#    state: restarted
+#  become: true
