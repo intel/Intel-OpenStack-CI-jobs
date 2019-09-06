@@ -575,6 +575,6 @@
       Run virtual pmem tempest plugin tests.
       Only trigger this job on specific file changes
     files:
-      - ../../opendev.org/openstack/nova/doc/source/admin/.*
-      - ../../opendev.org/openstack/nova/nova/compute/manager.py
+      - ../../../opendev.org/openstack/nova/doc/source/admin/.*
+      - ../../../opendev.org/openstack/nova/nova/compute/manager.py
 
