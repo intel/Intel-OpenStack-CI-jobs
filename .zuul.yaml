@@ -469,7 +469,7 @@
 
 - job:
     name: smoketest-aep
-    parent: smoketest-base
+    parent: smoketest
     description: |
       Smoketest to validate AEP test node connectivity
     nodeset:
