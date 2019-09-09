@@ -578,7 +578,7 @@
       nodes:
         - name: controller
           label: vm-dyn-aep
-    files:
-      - ../../../opendev.org/openstack/nova/doc/source/admin/.*
-      - ../../../opendev.org/openstack/nova/nova/compute/manager.py
+#   files:
+#     - ../../../opendev.org/openstack/nova/doc/source/admin/.*
+#     - ../../../opendev.org/openstack/nova/nova/compute/manager.py
 
