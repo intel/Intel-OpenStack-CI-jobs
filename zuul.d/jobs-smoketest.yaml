@@ -1,0 +1,62 @@
+- job:
+    name: smoketest-base
+    description: |
+      minimal test to verify infra is working
+    pre-run: playbooks/base-intel/pre.yaml
+    run: playbooks/base-intel-no-devstack/run.yaml
+    post-run: playbooks/base-intel/post.yaml
+    vars:
+      ansible_user_dir: /srv/static/ansible_user_logs/
+      dest_dir: "/opt/stack"
+      devstack_dir: "{{ dest_dir }}/devstack"
+      devstack_repo: git://github.com/openstack-dev/devstack.git
+      devstack_version: "master"
+      host_ip: "{{ ansible_default_ipv4.address }}"
+      no_log: false
+      os_password: devstack
+      outfile: "{{ output_dir }}/{{ testfile }}"
+      output_dir: "{{ zuul_output_dir }}/logs"
+      pip_info_log: "{{ sys_info_dir }}/pip_log.txt"
+      sys_info_dir: "{{ output_dir }}/sys_info"
+      userlogfile: "{{ ansible_user_dir }}/user_output_log.txt"
+      zuul_log_verbose: true
+      zuul_output_dir: /srv/static/logs
+
+- job:
+    name: smoketest-metal-static-xenial-x710
+    parent: smoketest-base
+    description: |
+      Smoketest to validate SRIOV test node connectivity
+    nodeset:
+      nodes:
+        - name: controller
+          label: metal-static-xenial-x710-sriov-new
+
+- job:
+    name: smoketest-aep
+    parent: smoketest-base
+    description: |
+      Smoketest to validate AEP test node connectivity
+    nodeset:
+      nodes:
+        - name: controller
+          label: vm-dyn-aep
+
+- job:
+    name: test-baremetal
+    parent: base-intel-no-devstack
+    description: |
+      minimal job including devstack pre/post to exercise test node
+    run: playbooks/base-intel-no-devstack/run.yaml
+    required-projects:
+      - opendev.org/x/tap-as-a-service
+      - opendev.org/openstack/devstack
+      - opendev.org/opendev/ci-sandbox
+      - opendev.org/openstack/neutron
+    vars:
+      testfile: testfile1.txt
+    nodeset:
+      nodes:
+        - name: controller
+          label: ubuntu-xenial-metal
+

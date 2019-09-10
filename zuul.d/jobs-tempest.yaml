@@ -1,0 +1,84 @@
+- job:
+    name: i-devstack-tempest
+    parent: base-intel-devstack
+    description: |
+      Base Intel Tempest job
+
+      This is a parallel job to upstream devstack-tempest
+      https://opendev.org/openstack/tempest/src/branch/master/.zuul.yaml
+    nodeset:
+      nodes:
+        - name: tempest
+          label: vm-dyn-xenial
+    required-projects:
+      - opendev.org/openstack/tempest
+    roles:
+      - zuul: zuul/zuul-jobs
+      - zuul: opendev.org/openstack/devstack
+      - zuul: opendev.org/openstack/tempest
+    vars:
+      # try fiddling with these
+      devstack_repo: https://opendev.org/openstack/devstack.git
+      zuul_output_dir: /srv/static
+      devstack_services:
+        tempest: true
+      devstack_localrc:
+        GIT_BASE: "https://opendev.org"
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            compute:
+              min_compute_nodes: "{{ groups['compute'] | default(['controller']) | length }}"
+      test_results_stage_name: test_results
+      zuul_copy_output:
+        '{{ devstack_base_dir }}/tempest/etc/tempest.conf': logs
+        '{{ devstack_base_dir }}/tempest/etc/accounts.yaml': logs
+        '{{ devstack_base_dir }}/tempest/tempest.log': logs
+        '{{ stage_dir }}/{{ test_results_stage_name }}.subunit': logs
+        '{{ stage_dir }}/{{ test_results_stage_name }}.html': logs
+        '{{ stage_dir }}/stackviz': logs
+      extensions_to_txt:
+        conf: true
+        log: true
+        yaml: true
+        yml: true
+    run: playbooks/tempest/devstack-tempest.yaml
+    post-run: playbooks/tempest/post-tempest.yaml
+
+- job:
+    name: test-tempest-full-py2
+    parent: i-devstack-tempest
+    description: |
+      Base integration test with python2
+
+      This is a parallel job to upstream tempest-full
+      https://opendev.org/openstack/tempest/src/branch/master/.zuul.yaml
+    vars:
+      tox_envlist: full
+      # tempest_test_regex: tempest
+      devstack_localrc:
+        ENABLE_FILE_INJECTION: true
+        ENABLE_VOLUME_MULTIATTACH: true
+
+- job:
+    name: test-tempest-full-py3
+    parent: i-devstack-tempest
+    description: |
+      Base integration test with python3
+
+      This is a parallel job to upstream tempest-full-py3
+      https://opendev.org/openstack/tempest/src/branch/master/.zuul.yaml
+    vars:
+      tox_envlist: full
+      # tempest_test_regex: tempest
+      devstack_localrc:
+        USE_PYTHON3: true
+        ENABLE_FILE_INJECTION: true
+        ENABLE_VOLUME_MULTIATTACH: true
+      devstack_services:
+        s-account: false
+        s-container: false
+        s-object: false
+        s-proxy: false
+        # without Swift, c-bak cannot run (in the Gate at least)
+        c-bak: false
