@@ -102,10 +102,10 @@
   become: true
   become_user: stack
 
-- name: apply vpmem patch
-  shell: cd /opt/stack/nova && git fetch https://review.opendev.org/openstack/nova refs/changes/70/678470/13 && git checkout FETCH_HEAD && git checkout -b vpmem
-  become: true
-  become_user: stack
+#- name: apply vpmem patch
+#  shell: cd /opt/stack/nova && git fetch https://review.opendev.org/openstack/nova refs/changes/70/678470/13 && git checkout FETCH_HEAD && git checkout -b vpmem
+#  become: true
+#  become_user: stack
 
 - name: upgrade DB
   shell: nova-manage  --config-file /etc/nova/nova_cell1.conf  db sync  --local_cell
