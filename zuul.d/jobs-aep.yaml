@@ -102,6 +102,6 @@
    files:
      # Set specific files for https://review.opendev.org/#/c/679640/ until
      # we get a getter filter
-     - ../../../opendev.org/openstack/nova/conf/libvirt.py
-     - ../../../opendev.org/openstack/nova/virt/libvirt/*
+     - ../../../opendev.org/openstack/nova/nova/conf/libvirt.py
+     - ../../../opendev.org/openstack/nova/nova/virt/libvirt/*
 
