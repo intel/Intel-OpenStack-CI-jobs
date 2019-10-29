@@ -63,6 +63,7 @@
         q-svc: true
         tempest: true
       devstack_localrc:
+        USE_PYTHON3: true
         HOST_IP: "{{ host_ip }}"
         ADMIN_PASSWORD: "{{ os_password }}"
         DATABASE_PASSWORD: "{{ os_password }}"
